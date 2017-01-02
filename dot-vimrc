@@ -1,0 +1,105 @@
+" Use vim settings instead of the vi settings.
+" Put this first, because it changes other options as a side effect.
+set nocompatible                       
+
+"Plugins {{{
+filetype off 						                " Disable filetype detection, allow it after loading all plugins.
+runtime bundle/vim-pathogen/autoload/pathogen.vim	" Load pathogen plugin.
+call pathogen#infect()				                " Load the rest of plugins with the help of pathogen.
+call pathogen#helptags()			                " Generate plugins helptags
+filetype plugin indent on 			                " Enable filetype detection, filetype specific plugins and indenting.
+
+function! InstallPlugins()
+    execute ':silent !mkdir -p ~/.vim/bundle'
+
+    execute ':silent !git clone https://github.com/tpope/vim-pathogen.git ~/.vim/bundle/vim-pathogen'
+    execute ':silent !git clone git://github.com/altercation/vim-colors-solarized.git ~/.vim/bundle/vim-colors-solarized' 
+
+	" reload .vimrc
+    source $MYVIMRC
+endfunction
+"}}}
+
+"Misc settings {{{
+set shell=bash						" Vim expects posix-compliant shell	
+"}}}
+
+"Leader Shortcuts {{{
+" Set map leader to ',' and local mapleader to '\'
+let mapleader=","
+let maplocalleader="\\"
+
+" jk is escape from insert mode
+inoremap jk <esc>
+
+" Edit and Load .vimrc
+nnoremap <leader>ev :vsp $MYVIMRC<CR>
+noremap <leader>sv :source $MYVIMRC<CR>
+"}}}
+
+"Colors {{{
+syntax enable 							" Enable syntax highlighting. 
+set background=dark
+colorscheme solarized
+"}}}
+
+"UI Config {{{
+set number 								" Always show line numbers
+set relativenumber						" Show relative to current line numbers 
+set showcmd                             " Show command in the bottom bar
+set cursorline                          " Highlite current line
+set wildmenu                            " Visual autocomplete for command menu
+set lazyredraw                          " Redraw only when we need to.
+set showmatch                           " Highlight matching [{()}]
+"}}}
+
+"Spaces & Tabs {{{
+set tabstop=4						" A tab is 4 spaces
+set softtabstop=4               			" A tab alos is 4 spaces when inserting it in insert mode
+set expandtab                   			" Expand tabs by default (overloadable per file type later)
+set shiftwidth=4                			" Number of spaces to use for autoindenting
+set shiftround                  			" Use multiple of shiftwidth when indenting with '<' and '>'j
+set smarttab                    			" insert tabs on the start of a line according to shiftwidth, not tabstop
+set autoindent                  			" always set autoindenting on
+set copyindent                  			" copy the previous indentation on autoindenting
+set backspace=indent,eol,start  			" Allow backspacing over everything in insert mode.
+set nowrap 						            " Do not wrap lines
+"}}}
+
+"Editing {{{
+set pastetoggle=<F2>					" When in insert mode, press <F2> to switch to paste mode, 
+										" this allows to paste mass data that won't be autoindented
+"}}}
+
+"Folding rules {{{
+set foldenable                  			" enable folding
+set foldcolumn=2                			" add a fold column
+set foldmethod=marker           			" detect triple-{ style fold markers
+set foldlevelstart=99           			" start out with everything unfolded
+set foldopen=block,hor,insert,jump,mark,percent,quickfix,search,tag,undo	" which commands trigger auto-unfold
+
+function! MyFoldText()
+    let line = getline(v:foldstart)
+
+    let nucolwidth = &fdc + &number * &numberwidth
+    let windowwidth = winwidth(0) - nucolwidth - 3
+    let foldedlinecount = v:foldend - v:foldstart
+
+    " expand tabs into spaces
+    let onetab = strpart('        ', 0, &tabstop)
+    let line = substitute(line, '\t', onetab, 'g')
+
+    let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
+    let fillcharcount = windowwidth - len(line) - len(foldedlinecount) - 4
+    return line . ' …' . repeat(" ",fillcharcount) . foldedlinecount . ' '
+endfunction
+"set foldtext=MyFoldText()
+
+" Mappings to easily toggle fold levels
+nnoremap z0 :set foldlevel=0<cr>
+nnoremap z1 :set foldlevel=1<cr>
+nnoremap z2 :set foldlevel=2<cr>
+nnoremap z3 :set foldlevel=3<cr>
+nnoremap z4 :set foldlevel=4<cr>
+nnoremap z5 :set foldlevel=5<cr>
+"}}}
