@@ -1,9 +1,11 @@
+"Misc settings {{{
 " Use vim settings instead of the vi settings.
 " Put this first, because it changes other options as a side effect.
 set nocompatible                       
+set shell=bash						" Vim expects posix-compliant shell	
+"}}}
 
 "Plugins {{{
-filetype off 						                " Disable filetype detection, allow it after loading all plugins.
 runtime bundle/vim-pathogen/autoload/pathogen.vim	" Load pathogen plugin.
 call pathogen#infect()				                " Load the rest of plugins with the help of pathogen.
 call pathogen#helptags()			                " Generate plugins helptags
@@ -20,8 +22,13 @@ function! InstallPlugins()
 endfunction
 "}}}
 
-"Misc settings {{{
-set shell=bash						" Vim expects posix-compliant shell	
+"Colors {{{
+syntax on    							" Enable syntax highlighting. 
+set background=dark                     " Use dark solarized theme by default
+set t_Co=16                             " Set vim to use 16
+let g:solarized_termcolors=16
+colorscheme solarized
+call togglebg#map("<F5>")
 "}}}
 
 "Leader Shortcuts {{{
@@ -35,12 +42,6 @@ inoremap jk <esc>
 " Edit and Load .vimrc
 nnoremap <leader>ev :vsp $MYVIMRC<CR>
 noremap <leader>sv :source $MYVIMRC<CR>
-"}}}
-
-"Colors {{{
-syntax enable 							" Enable syntax highlighting. 
-set background=dark
-colorscheme solarized
 "}}}
 
 "UI Config {{{
