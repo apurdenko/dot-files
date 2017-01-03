@@ -3,6 +3,8 @@
 " Put this first, because it changes other options as a side effect.
 set nocompatible                       
 set shell=bash						" Vim expects posix-compliant shell	
+set hidden                          " Hide buffer instead of destroying it when openning a new buffer
+set encoding=utf-8                  " Sets how vim shall represent characters internally. Utf-8 is necessary for most flavors of Unicode.
 "}}}
 
 "Plugins {{{
@@ -14,8 +16,15 @@ filetype plugin indent on 			                " Enable filetype detection, filety
 function! InstallPlugins()
     execute ':silent !mkdir -p ~/.vim/bundle'
 
-    execute ':silent !git clone https://github.com/tpope/vim-pathogen.git ~/.vim/bundle/vim-pathogen'
-    execute ':silent !git clone git://github.com/altercation/vim-colors-solarized.git ~/.vim/bundle/vim-colors-solarized' 
+    if empty(glob("~/.vim/bundle/vim-pathogen"))
+    	execute ':silent !git clone https://github.com/tpope/vim-pathogen.git ~/.vim/bundle/vim-pathogen'
+	endif
+    if empty(glob("~/.vim/bundle/vim-colors-solarized"))
+    	execute ':silent !git clone git://github.com/altercation/vim-colors-solarized.git ~/.vim/bundle/vim-colors-solarized' 
+	endif
+    if empty(glob("~/.vim/bundle/nerdtre"))
+		execute ':silent !git clone https://github.com/scrooloose/nerdtree.git ~/.vim/bundle/nerdtree'
+	endif
 
 	" reload .vimrc
     source $MYVIMRC
@@ -48,10 +57,41 @@ noremap <leader>sv :source $MYVIMRC<CR>
 set number 								" Always show line numbers
 set relativenumber						" Show relative to current line numbers 
 set showcmd                             " Show command in the bottom bar
+set showmode                            " Show vim insert mode
 set cursorline                          " Highlite current line
 set wildmenu                            " Visual autocomplete for command menu
+set wildmode=longest:list,full          " First tab will complete to longest string and show the match list, 
+                                        " then second tab will complete to first full match and open the wildmenu.
+set visualbell                          " Visual bell instead of sound bell
+set ruler                               " Show info about current line, column etc in the status bar
+set rulerformat=%l,%c%V%=%P             " Show number of current line, column, virtual column and current offset in percent
+
+"}}}
+
+" Speed Optimization {{{
 set lazyredraw                          " Redraw only when we need to.
+set ttyfast                             " Indicates a fast terminal connection. 
+"}}}
+
+"Searching and highliting {{{
+" Makes searches use normal regexes.
+nnoremap / /\v
+vnoremap / /\v
+
+set ignorecase                          " Ignore case in search command
+set smartcase                           " Inteligent case handling in search: ignore case if searching all in lowercase, 
+                                        " but case sensitive when searching in mixed cases
+set gdefault                            " Applies substitutions globally on lines.
+set incsearch                           " While typing a search command, show where the pattern, as it was typed so far, matches. 
 set showmatch                           " Highlight matching [{()}]
+set hlsearch                            " When there is a previous search pattern, highlight all its matches.
+
+" Clear the search highliting
+nnoremap <leader><space> :noh<cr>
+
+" Make the tab key match bracket pairs.
+nnoremap <tab> %
+vnoremap <tab> %
 "}}}
 
 "Spaces & Tabs {{{
@@ -70,12 +110,12 @@ set nowrap 						            " Do not wrap lines
 "Editing {{{
 set pastetoggle=<F2>					" When in insert mode, press <F2> to switch to paste mode, 
 										" this allows to paste mass data that won't be autoindented
-"}}}
+"}}} 
 
-"Folding rules {{{
-set foldenable                  			" enable folding
-set foldcolumn=2                			" add a fold column
-set foldmethod=marker           			" detect triple-{ style fold markers
+"Folding rules {{{ 
+set foldenable                  			" enable folding 
+set foldcolumn=2                			" add a fold column 
+set foldmethod=marker           			" detect triple-{ style fold markers 
 set foldlevelstart=99           			" start out with everything unfolded
 set foldopen=block,hor,insert,jump,mark,percent,quickfix,search,tag,undo	" which commands trigger auto-unfold
 
@@ -96,6 +136,13 @@ function! MyFoldText()
 endfunction
 "set foldtext=MyFoldText()
 
+" Text wrapping {{{
+set wrap
+set textwidth=79
+set formatoptions=qrn1
+set colorcolumn=85
+" }}}
+
 " Mappings to easily toggle fold levels
 nnoremap z0 :set foldlevel=0<cr>
 nnoremap z1 :set foldlevel=1<cr>
@@ -104,3 +151,19 @@ nnoremap z3 :set foldlevel=3<cr>
 nnoremap z4 :set foldlevel=4<cr>
 nnoremap z5 :set foldlevel=5<cr>
 "}}}
+
+" NERDTree {{{
+" Open/close file tree
+map <C-n> :NERDTreeToggle<CR>
+
+let g:NERDTreeDirArrowExpandable = '▸'
+let g:NERDTreeDirArrowCollapsible = '▾'
+
+" Close vim if the only window left open is a NERDTree
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+
+" Open NERDTree automatically when vim starts up on opening a directory
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | endif
+
+" }}}
