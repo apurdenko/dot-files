@@ -1,3 +1,4 @@
+"
 "Misc settings {{{
 " Use vim settings instead of the vi settings.
 " Put this first, because it changes other options as a side effect.
@@ -5,6 +6,7 @@ set nocompatible
 set shell=bash						" Vim expects posix-compliant shell	
 set hidden                          " Hide buffer instead of destroying it when openning a new buffer
 set encoding=utf-8                  " Sets how vim shall represent characters internally. Utf-8 is necessary for most flavors of Unicode.
+set path+=**                        " Allow recurcive file searching and completion
 "}}}
 
 "Plugins {{{
@@ -104,7 +106,6 @@ set smarttab                    			" insert tabs on the start of a line accordin
 set autoindent                  			" always set autoindenting on
 set copyindent                  			" copy the previous indentation on autoindenting
 set backspace=indent,eol,start  			" Allow backspacing over everything in insert mode.
-set nowrap 						            " Do not wrap lines
 "}}}
 
 "Editing {{{
@@ -137,7 +138,8 @@ endfunction
 "set foldtext=MyFoldText()
 
 " Text wrapping {{{
-set wrap
+set nowrap 						            " Do not wrap lines
+"set wrap
 set textwidth=79
 set formatoptions=qrn1
 set colorcolumn=85
