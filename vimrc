@@ -6,40 +6,52 @@ set nocompatible
 set shell=bash						" Vim expects posix-compliant shell	
 set hidden                          " Hide buffer instead of destroying it when openning a new buffer
 set encoding=utf-8                  " Sets how vim shall represent characters internally. Utf-8 is necessary for most flavors of Unicode.
-set path+=**                        " Allow recurcive file searching and completion
 "}}}
 
 "Plugins {{{
-runtime bundle/vim-pathogen/autoload/pathogen.vim	" Load pathogen plugin.
-call pathogen#infect()				                " Load the rest of plugins with the help of pathogen.
-call pathogen#helptags()			                " Generate plugins helptags
+let g:has_plugin_vim_pathogen = !empty(glob("~/.vim/bundle/vim-pathogen"))
+let g:has_plugin_vim_colors_solarized = !empty(glob("~/.vim/bundle/vim-colors-solarized"))
+let g:has_plugin_vim_nerdtre = !empty(glob("~/.vim/bundle/nerdtre"))
+
+if g:has_plugin_vim_pathogen
+    runtime bundle/vim-pathogen/autoload/pathogen.vim	" Load pathogen plugin.
+    call pathogen#infect()				                " Load the rest of plugins with the help of pathogen.
+    call pathogen#helptags()			                " Generate plugins helptags
+endif
+
 filetype plugin indent on 			                " Enable filetype detection, filetype specific plugins and indenting.
 
-function! InstallPlugins()
+function! DownloadPlugins()
     execute ':silent !mkdir -p ~/.vim/bundle'
 
-    if empty(glob("~/.vim/bundle/vim-pathogen"))
+    if !g:has_plugin_vim_pathogen
     	execute ':silent !git clone https://github.com/tpope/vim-pathogen.git ~/.vim/bundle/vim-pathogen'
 	endif
-    if empty(glob("~/.vim/bundle/vim-colors-solarized"))
+    if !g:has_plugin_vim_colors_solarized
     	execute ':silent !git clone git://github.com/altercation/vim-colors-solarized.git ~/.vim/bundle/vim-colors-solarized' 
 	endif
-    if empty(glob("~/.vim/bundle/nerdtre"))
+    if !g:has_plugin_vim_nerdtre
 		execute ':silent !git clone https://github.com/scrooloose/nerdtree.git ~/.vim/bundle/nerdtree'
 	endif
 
 	" reload .vimrc
-    source $MYVIMRC
+    " source $MYVIMRC
+  
+    " refresh view 
+    execute ':redraw!'
 endfunction
 "}}}
 
 "Colors {{{
-syntax on    							" Enable syntax highlighting. 
-set background=dark                     " Use dark solarized theme by default
-set t_Co=16                             " Set vim to use 16
 let g:solarized_termcolors=16
-colorscheme solarized
-call togglebg#map("<F5>")
+syntax on    							" Enable syntax highlighting. 
+set t_Co=16                             " Set vim to use 16
+
+if g:has_plugin_vim_colors_solarized
+    set background=dark                 " Use dark solarized theme by default
+    colorscheme solarized
+    call togglebg#map("<F5>")
+endif
 "}}}
 
 "Leader Shortcuts {{{
@@ -67,7 +79,7 @@ set wildmode=longest:list,full          " First tab will complete to longest str
 set visualbell                          " Visual bell instead of sound bell
 set ruler                               " Show info about current line, column etc in the status bar
 set rulerformat=%l,%c%V%=%P             " Show number of current line, column, virtual column and current offset in percent
-
+set laststatus=2						" Set laststatus to 2 to always see a status line for each window
 "}}}
 
 " Speed Optimization {{{
@@ -77,16 +89,18 @@ set ttyfast                             " Indicates a fast terminal connection.
 
 "Searching and highliting {{{
 " Makes searches use normal regexes.
-nnoremap / /\v
-vnoremap / /\v
+"nnoremap / /\v
+"vnoremap / /\v
 
 set ignorecase                          " Ignore case in search command
 set smartcase                           " Inteligent case handling in search: ignore case if searching all in lowercase, 
                                         " but case sensitive when searching in mixed cases
-set gdefault                            " Applies substitutions globally on lines.
+"set gdefault                            " Applies substitutions globally on lines.
 set incsearch                           " While typing a search command, show where the pattern, as it was typed so far, matches. 
 set showmatch                           " Highlight matching [{()}]
 set hlsearch                            " When there is a previous search pattern, highlight all its matches.
+
+set path+=**                        " Allow recurcive file searching and completion
 
 " Clear the search highliting
 nnoremap <leader><space> :noh<cr>
@@ -111,6 +125,7 @@ set backspace=indent,eol,start  			" Allow backspacing over everything in insert
 "Editing {{{
 set pastetoggle=<F2>					" When in insert mode, press <F2> to switch to paste mode, 
 										" this allows to paste mass data that won't be autoindented
+set binary                              " Set binary mode to newer write final new line when aditig binary file
 "}}} 
 
 "Folding rules {{{ 
@@ -137,14 +152,6 @@ function! MyFoldText()
 endfunction
 "set foldtext=MyFoldText()
 
-" Text wrapping {{{
-set nowrap 						            " Do not wrap lines
-"set wrap
-set textwidth=79
-set formatoptions=qrn1
-set colorcolumn=85
-" }}}
-
 " Mappings to easily toggle fold levels
 nnoremap z0 :set foldlevel=0<cr>
 nnoremap z1 :set foldlevel=1<cr>
@@ -153,6 +160,14 @@ nnoremap z3 :set foldlevel=3<cr>
 nnoremap z4 :set foldlevel=4<cr>
 nnoremap z5 :set foldlevel=5<cr>
 "}}}
+
+" Text wrapping {{{
+set nowrap 						            " Do not wrap lines
+"set wrap
+set textwidth=79
+set formatoptions=qrn1
+set colorcolumn=85
+" }}}
 
 " NERDTree {{{
 " Open/close file tree
