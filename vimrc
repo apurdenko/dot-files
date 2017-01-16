@@ -1,4 +1,3 @@
-"
 "Misc settings {{{
 " Use vim settings instead of the vi settings.
 " Put this first, because it changes other options as a side effect.
@@ -64,12 +63,10 @@ inoremap jk <esc>
 
 " Edit and Load .vimrc
 nnoremap <leader>ev :vsp $MYVIMRC<CR>
-noremap <leader>sv :source $MYVIMRC<CR>
+nnoremap <leader>sv :source $MYVIMRC<CR>
 "}}}
 
 "UI Config {{{
-set number 								" Always show line numbers
-set relativenumber						" Show relative to current line numbers 
 set showcmd                             " Show command in the bottom bar
 set showmode                            " Show vim insert mode
 set cursorline                          " Highlite current line
@@ -80,6 +77,19 @@ set visualbell                          " Visual bell instead of sound bell
 set ruler                               " Show info about current line, column etc in the status bar
 set rulerformat=%l,%c%V%=%P             " Show number of current line, column, virtual column and current offset in percent
 set laststatus=2						" Set laststatus to 2 to always see a status line for each window
+
+set number 								" Always show line numbers
+set relativenumber						" Show relative to current line numbers 
+
+" toggle relative numbering
+nnoremap <leader>rn : call RelativeNumberToggle() <CR>
+function! RelativeNumberToggle()
+	if &relativenumber == 0
+		set relativenumber
+	else
+		set norelativenumber
+	endif
+endfunction
 "}}}
 
 " Speed Optimization {{{
@@ -162,16 +172,31 @@ nnoremap z5 :set foldlevel=5<cr>
 "}}}
 
 " Text wrapping {{{
-set nowrap 						            " Do not wrap lines
-"set wrap
-set textwidth=79
-set formatoptions=qrn1
-set colorcolumn=85
+set wrap					" Wrap lines longer than the width of the window
+set colorcolumn=80
+
+set textwidth=0		" set textwrap to 0 to disable text wrapping
+" default vims format options are: tcq (auto-wrap text, autowrap comments, allow formating of comments with 'gq'
+set formatoptions+=r " auto inserting the current comment leader on hitting ENTER
+set formatoptions+=n " recognize numbered lists when formation text
+set formatoptions+=1 " don't break a line after a one-letter word.
+set formatoptions+=j " remove a comment leader when joining lines.
+ 
+" toggle text wrapping
+nnoremap <leader>tw : call TextWrapToggle() <CR>
+function! TextWrapToggle()
+	if &textwidth == 0
+		set textwidth=79
+	else
+		set textwidth=0
+	endif
+endfunction
 " }}}
 
 " NERDTree {{{
 " Open/close file tree
-map <C-n> :NERDTreeToggle<CR>
+nnoremap <leader>nt :NERDTreeToggle<CR>
+nnoremap <leader>nf :NERDTreeFind<CR>
 
 let g:NERDTreeDirArrowExpandable = '▸'
 let g:NERDTreeDirArrowCollapsible = '▾'
