@@ -5,6 +5,7 @@ set nocompatible
 set shell=bash						" Vim expects posix-compliant shell	
 set hidden                          " Hide buffer instead of destroying it when openning a new buffer
 set encoding=utf-8                  " Sets how vim shall represent characters internally. Utf-8 is necessary for most flavors of Unicode.
+set cryptmethod=blowfish2			" Use the best encryption method when writing crypted files
 "}}}
 
 "Plugins {{{
