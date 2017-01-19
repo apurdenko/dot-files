@@ -7,7 +7,7 @@ set hidden                          " Hide buffer instead of destroying it when 
 set encoding=utf-8                  " Sets how vim shall represent characters internally. Utf-8 is necessary for most flavors of Unicode.
 "}}}
 
-"Plugins {{{
+"Plugin Installing {{{
 
 " Brief help
 " :call PluginInstallVundle	- lists configured plugins
@@ -33,9 +33,17 @@ if g:has_plugin_vundle
 	" required
 	call vundle#begin()
 
-	" plugins on GitHub
-	Plugin 'altercation/vim-colors-solarized' 
+	" Solarized colorscheme. On GitHub.
+	Plugin 'altercation/vim-colors-solarized'
+
+	" File manager. On GitHub. 
 	Plugin 'scrooloose/nerdtree'
+	
+	" Open file and go to line: vim hello.cpp:10. On GitHub.
+	Plugin 'bogado/file-line'
+	
+	" Key mappings for cscope commands. GitHub.
+	Plugin 'chazy/cscope_maps'
 	
 	call vundle#end()
 
@@ -232,7 +240,7 @@ function! TextWrapToggle()
 endfunction
 " }}}
 
-" NERDTree {{{
+" NERDTree Settings {{{
 " Open/close file tree
 nnoremap <leader>nt :NERDTreeToggle<CR>
 nnoremap <leader>nf :NERDTreeFind<CR>
@@ -248,3 +256,13 @@ autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | endif
 
 " }}}
+
+" Cscope Settings {{{
+
+function! CSRebuildIndex()
+	execute ':silent !find $(pwd) -name "*.h" -or -name "*.c" -or -name "*.cpp"  > $(pwd)/cscope.files' 
+	execute ':silent !find $(pwd) -name "*.java" >> $(pwd)/cscope.files'
+	execute ':silent !cscope -R -b -q -k'
+	execute ':cs add cscope.out'
+	execute ':redraw!'
+endfunction
