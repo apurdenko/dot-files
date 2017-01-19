@@ -8,37 +8,55 @@ set encoding=utf-8                  " Sets how vim shall represent characters in
 set cryptmethod=blowfish2			" Use the best encryption method when writing crypted files
 "}}}
 
-"Plugins {{{
-let g:has_plugin_vim_pathogen = !empty(glob("~/.vim/bundle/vim-pathogen"))
-let g:has_plugin_vim_colors_solarized = !empty(glob("~/.vim/bundle/vim-colors-solarized"))
-let g:has_plugin_vim_nerdtre = !empty(glob("~/.vim/bundle/nerdtre"))
+"Plugin Installing {{{
 
-if g:has_plugin_vim_pathogen
-    runtime bundle/vim-pathogen/autoload/pathogen.vim	" Load pathogen plugin.
-    call pathogen#infect()				                " Load the rest of plugins with the help of pathogen.
-    call pathogen#helptags()			                " Generate plugins helptags
+" Brief help
+" :call PluginInstallVundle	- lists configured plugins
+" :PluginList				- lists configured plugins
+" :PluginInstall			- installs plugins; 
+"								append `!` to update or just :PluginUpdate
+" :PluginSearch foo			- searches for foo; 
+"								append `!` to refresh local cache
+" :PluginClean				- confirms removal of unused plugins; 
+"								append `!` to auto-approve removal
+"								check once if we have vundle plugin istalled 
+
+let g:has_plugin_vundle = isdirectory(expand("~/.vim/bundle/Vundle.vim/.git")) 
+let g:has_plugin_vim_colors_solarized = isdirectory(expand("~/.vim/bundle/vim-colors-solarized/.git"))
+
+" set the runtime path to include Vundle and initialize
+set runtimepath+=~/.vim/bundle/Vundle.vim
+
+if g:has_plugin_vundle
+	" must be off before loading plugins
+	filetype off
+	
+	" required
+	call vundle#begin()
+
+	" Solarized colorscheme. On GitHub.
+	Plugin 'altercation/vim-colors-solarized'
+
+	" File manager. On GitHub. 
+	Plugin 'scrooloose/nerdtree'
+	
+	" Open file and go to line: vim hello.cpp:10. On GitHub.
+	Plugin 'bogado/file-line'
+	
+	" Key mappings for cscope commands. GitHub.
+	Plugin 'chazy/cscope_maps'
+	
+	call vundle#end()
+
+	" turn on to activate filetype-speciffic settings read from plugins
+	filetype plugin indent on
 endif
 
-filetype plugin indent on 			                " Enable filetype detection, filetype specific plugins and indenting.
-
-function! DownloadPlugins()
-    execute ':silent !mkdir -p ~/.vim/bundle'
-
-    if !g:has_plugin_vim_pathogen
-    	execute ':silent !git clone https://github.com/tpope/vim-pathogen.git ~/.vim/bundle/vim-pathogen'
+function! PluginVundleInstall()
+	if !g:has_plugin_vundle
+		execute ':silent !mkdir -p ~/.vim/bundle'
+		execute ':silent !git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim'
 	endif
-    if !g:has_plugin_vim_colors_solarized
-    	execute ':silent !git clone git://github.com/altercation/vim-colors-solarized.git ~/.vim/bundle/vim-colors-solarized' 
-	endif
-    if !g:has_plugin_vim_nerdtre
-		execute ':silent !git clone https://github.com/scrooloose/nerdtree.git ~/.vim/bundle/nerdtree'
-	endif
-
-	" reload .vimrc
-    " source $MYVIMRC
-  
-    " refresh view 
-    execute ':redraw!'
 endfunction
 "}}}
 
@@ -65,6 +83,16 @@ inoremap jk <esc>
 " Edit and Load .vimrc
 nnoremap <leader>ev :vsp $MYVIMRC<CR>
 nnoremap <leader>sv :source $MYVIMRC<CR>
+
+" Smart way to move between windows
+nnoremap <C-j> <C-W>j
+nnoremap <C-k> <C-W>k
+nnoremap <C-h> <C-W>h
+nnoremap <C-l> <C-W>l
+
+" Treat long lines as break lines (useful when moving around in them)
+nnoremap j gj
+nnoremap k gk
 "}}}
 
 "UI Config {{{
@@ -74,6 +102,7 @@ set cursorline                          " Highlite current line
 set wildmenu                            " Visual autocomplete for command menu
 set wildmode=longest:list,full          " First tab will complete to longest string and show the match list, 
                                         " then second tab will complete to first full match and open the wildmenu.
+set wildignore=*.o,*~,*.pyc,*.lass		" Ignore compiled files
 set visualbell                          " Visual bell instead of sound bell
 set ruler                               " Show info about current line, column etc in the status bar
 set rulerformat=%l,%c%V%=%P             " Show number of current line, column, virtual column and current offset in percent
@@ -137,6 +166,24 @@ set backspace=indent,eol,start  			" Allow backspacing over everything in insert
 set pastetoggle=<F2>					" When in insert mode, press <F2> to switch to paste mode, 
 										" this allows to paste mass data that won't be autoindented
 set binary                              " Set binary mode to newer write final new line when aditig binary file
+
+" Autoinsertion of different bocks
+inoremap <leader>( ()<esc>i
+inoremap <leader>[ []<esc>i
+inoremap <leader>{ {}<esc>i
+inoremap <leader>{{ {<esc>o}<esc>O<tab>
+inoremap <leader>' ''<esc>i
+inoremap <leader>" ""<esc>i
+inoremap <leader>< <><esc>i
+
+"Insert #include <> 
+inoremap <leader>IN #include <><esc>i
+"Insert #include ""
+inoremap <leader>in #include ""<esc>i
+
+" Insert if block
+inoremap <leader>if if ()<cr>{<cr><cr>}<esc>3k$i
+
 "}}} 
 
 "Folding rules {{{ 
@@ -194,7 +241,7 @@ function! TextWrapToggle()
 endfunction
 " }}}
 
-" NERDTree {{{
+" NERDTree Settings {{{
 " Open/close file tree
 nnoremap <leader>nt :NERDTreeToggle<CR>
 nnoremap <leader>nf :NERDTreeFind<CR>
@@ -210,3 +257,13 @@ autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | endif
 
 " }}}
+
+" Cscope Settings {{{
+
+function! CSRebuildIndex()
+	execute ':silent !find $(pwd) -name "*.h" -or -name "*.c" -or -name "*.cpp"  > $(pwd)/cscope.files' 
+	execute ':silent !find $(pwd) -name "*.java" >> $(pwd)/cscope.files'
+	execute ':silent !cscope -R -b -q -k'
+	execute ':cs add cscope.out'
+	execute ':redraw!'
+endfunction
