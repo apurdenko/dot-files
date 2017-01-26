@@ -23,6 +23,7 @@ set cryptmethod=blowfish2			" Use the best encryption method when writing crypte
 
 let g:has_plugin_vundle = isdirectory(expand("~/.vim/bundle/Vundle.vim/.git")) 
 let g:has_plugin_vim_colors_solarized = isdirectory(expand("~/.vim/bundle/vim-colors-solarized/.git"))
+let g:has_plugin_nerdtree = isdirectory(expand("~/.vim/bundle/nerdtree/.git")) 
 
 " set the runtime path to include Vundle and initialize
 set runtimepath+=~/.vim/bundle/Vundle.vim
@@ -46,6 +47,12 @@ if g:has_plugin_vundle
 	" Key mappings for cscope commands. GitHub.
 	Plugin 'chazy/cscope_maps'
 	
+	" PlantUML syntax
+	Plugin 'aklt/plantuml-syntax'
+
+	" commenting code
+	Plugin 'tpope/vim-commentary'
+
 	call vundle#end()
 
 	" turn on to activate filetype-speciffic settings read from plugins
@@ -72,7 +79,7 @@ if g:has_plugin_vim_colors_solarized
 endif
 "}}}
 
-"Leader Shortcuts {{{
+" Key Shortcuts {{{
 " Set map leader to ',' and local mapleader to '\'
 let mapleader=","
 let maplocalleader="\\"
@@ -93,6 +100,10 @@ nnoremap <C-l> <C-W>l
 " Treat long lines as break lines (useful when moving around in them)
 nnoremap j gj
 nnoremap k gk
+
+" Allow saving of files as sudo when I forgot to start vim using sudo.
+cmap w!! w !sudo tee > /dev/null %
+
 "}}}
 
 "UI Config {{{
@@ -242,28 +253,50 @@ endfunction
 " }}}
 
 " NERDTree Settings {{{
-" Open/close file tree
-nnoremap <leader>nt :NERDTreeToggle<CR>
-nnoremap <leader>nf :NERDTreeFind<CR>
+if g:has_plugin_nerdtree
+	" Open/close file tree
+	nnoremap <leader>nt :NERDTreeToggle<CR>
+	nnoremap <leader>nf :NERDTreeFind<CR>
 
-let g:NERDTreeDirArrowExpandable = '▸'
-let g:NERDTreeDirArrowCollapsible = '▾'
+	let g:NERDTreeDirArrowExpandable = '▸'
+	let g:NERDTreeDirArrowCollapsible = '▾'
 
-" Close vim if the only window left open is a NERDTree
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+	" Close vim if the only window left open is a NERDTree
+	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
-" Open NERDTree automatically when vim starts up on opening a directory
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | endif
-
+	" Open NERDTree automatically when vim starts up on opening a directory
+	autocmd StdinReadPre * let s:std_in=1
+	autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | endif
+endif
 " }}}
 
 " Cscope Settings {{{
 
-function! CSRebuildIndex()
-	execute ':silent !find $(pwd) -name "*.h" -or -name "*.c" -or -name "*.cpp"  > $(pwd)/cscope.files' 
-	execute ':silent !find $(pwd) -name "*.java" >> $(pwd)/cscope.files'
-	execute ':silent !cscope -R -b -q -k'
-	execute ':cs add cscope.out'
-	execute ':redraw!'
-endfunction
+    " The following maps all invoke one of the following cscope search types:
+    " prefixes
+	"	CTRL-\ - result will be displayed in the current window.
+	"	CTRL-@ - result will be displayed in horizontally splitted window
+	"	CTRL-@@ - result will be displayed in vertically splitted window
+	"
+    "   's'   symbol: find all references to the token under cursor
+    "   'g'   global: find global definition(s) of the token under cursor
+    "   'c'   calls:  find all calls to the function name under cursor
+    "   't'   text:   find all instances of the text under cursor
+    "   'e'   egrep:  egrep search for the word under cursor
+    "   'f'   file:   open the filename under cursor
+    "   'i'   includes: find files that include the filename under cursor
+    "   'd'   called: find functions that function under cursor calls
+
+	function! RebuildIndexes()
+		" cscope files and tags
+		execute ':silent !find -L $(pwd) -name "*.h" -or -name "*.c" -or -name "*.cpp" > $(pwd)/cscope.files' 
+		execute ':silent !find -L $(pwd) -name "*.java" >> $(pwd)/cscope.files'
+		execute ':silent !cscope -R -b -q -k'
+		execute ':cs add cscope.out'
+
+		" ctags index
+		execute ':silent !ctags -R $(pwd)'
+
+		" refresh window
+		execute ':redraw!'
+	endfunction
