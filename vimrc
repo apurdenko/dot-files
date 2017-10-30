@@ -24,6 +24,7 @@ set cryptmethod=blowfish2			" Use the best encryption method when writing crypte
 let g:has_plugin_vundle = isdirectory(expand("~/.vim/bundle/Vundle.vim/.git")) 
 let g:has_plugin_vim_colors_solarized = isdirectory(expand("~/.vim/bundle/vim-colors-solarized/.git"))
 let g:has_plugin_nerdtree = isdirectory(expand("~/.vim/bundle/nerdtree/.git")) 
+let g:has_plugin_vim_commentary = isdirectory(expand("~/.vim/bundle/vim-commentary/.git")) 
 
 " set the runtime path to include Vundle and initialize
 set runtimepath+=~/.vim/bundle/Vundle.vim
@@ -45,13 +46,25 @@ if g:has_plugin_vundle
 	Plugin 'bogado/file-line'
 	
 	" Key mappings for cscope commands. GitHub.
-	Plugin 'chazy/cscope_maps'
+	"Plugin 'chazy/cscope_maps'
 	
 	" PlantUML syntax
 	Plugin 'aklt/plantuml-syntax'
 
 	" commenting code
 	Plugin 'tpope/vim-commentary'
+
+	" source code browser
+	Plugin 'vim-scripts/taglist.vim'
+
+	" swtich between source files and header files
+	Plugin 'vim-scripts/a.vim'
+
+	" Clang formatter plugin
+	Plugin 'rhysd/vim-clang-format'
+
+	" Plugin for defining custom user's operators
+	Plugin 'kana/vim-operator-user'
 
 	call vundle#end()
 
@@ -66,6 +79,13 @@ function! PluginVundleInstall()
 	endif
 endfunction
 "}}}
+
+" Commentary settings {{{"
+if g:has_plugin_vim_commentary
+	autocmd FileType c,cpp,cs,java setlocal commentstring=//\ %s
+endif
+"}}}"
+
 
 "Colors {{{
 let g:solarized_termcolors=16
@@ -162,15 +182,27 @@ vnoremap <tab> %
 "}}}
 
 "Spaces & Tabs {{{
-set tabstop=4						" A tab is 4 spaces
-set softtabstop=4               			" A tab alos is 4 spaces when inserting it in insert mode
-set expandtab                   			" Expand tabs by default (overloadable per file type later)
-set shiftwidth=4                			" Number of spaces to use for autoindenting
-set shiftround                  			" Use multiple of shiftwidth when indenting with '<' and '>'j
-set smarttab                    			" insert tabs on the start of a line according to shiftwidth, not tabstop
-set autoindent                  			" always set autoindenting on
-set copyindent                  			" copy the previous indentation on autoindenting
-set backspace=indent,eol,start  			" Allow backspacing over everything in insert mode.
+set tabstop=4					" A tab is 4 spaces
+set softtabstop=4        		" A tab alos is 4 spaces when inserting it in insert mode
+set expandtab              		" Expand tabs by default (overloadable per file type later)
+set shiftwidth=4          		" Number of spaces to use for autoindenting
+set shiftround            		" Use multiple of shiftwidth when indenting with '<' and '>'j
+set smarttab            " insert tabs on the start of a line according to shiftwidth, not tabstop
+set autoindent             		" always set autoindenting on
+set copyindent             		" copy the previous indentation on autoindenting
+set backspace=indent,eol,start 	" Allow backspacing over everything in insert mode.
+
+" Only do this part when compiled with support for autocommands.
+if has("autocmd")
+    " Use filetype detection and file-based automatic indenting.
+    filetype plugin indent on
+
+    " Use actual tab chars in Makefiles.
+    autocmd FileType make set tabstop=4 shiftwidth=4 softtabstop=0 noexpandtab
+    " Use chars in c/cpp.
+	autocmd FileType h,c,cpp,objc, set expandtab ts=4 sw=4 ai
+endif
+
 "}}}
 
 "Editing {{{
@@ -182,7 +214,7 @@ set binary                              " Set binary mode to newer write final n
 inoremap <leader>( ()<esc>i
 inoremap <leader>[ []<esc>i
 inoremap <leader>{ {}<esc>i
-inoremap <leader>{{ {<esc>o}<esc>O<tab>
+inoremap <leader>{{ {<esc>o}<esc>O
 inoremap <leader>' ''<esc>i
 inoremap <leader>" ""<esc>i
 inoremap <leader>< <><esc>i
@@ -193,7 +225,9 @@ inoremap <leader>IN #include <><esc>i
 inoremap <leader>in #include ""<esc>i
 
 " Insert if block
-inoremap <leader>if if ()<cr>{<cr><cr>}<esc>3k$i
+inoremap <leader>if if ()<esc>mmo{<cr>}<esc>`m$i
+" Insert if/else block
+inoremap <leader>ife if ()<esc>mmo{<cr>}<cr>else<cr>{<cr>}<esc>`m$i
 
 "}}} 
 
@@ -252,6 +286,7 @@ function! TextWrapToggle()
 endfunction
 " }}}
 
+
 " NERDTree Settings {{{
 if g:has_plugin_nerdtree
 	" Open/close file tree
@@ -266,7 +301,7 @@ if g:has_plugin_nerdtree
 
 	" Open NERDTree automatically when vim starts up on opening a directory
 	autocmd StdinReadPre * let s:std_in=1
-	autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | endif
+	autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | wincmd p | endif
 endif
 " }}}
 
@@ -300,3 +335,34 @@ endif
 		" refresh window
 		execute ':redraw!'
 	endfunction
+" }}}
+
+" Clang-format Settings {{{
+
+	let g:clang_format#code_style = "llvm"
+	let g:clang_format#style_options = {
+              \ "IndentWidth" : 4,
+              \ "UseTab" : "Never",
+              \ "AccessModifierOffset" : -4,
+              \ "AllowShortIfStatementsOnASingleLine" : "true",
+              \ "AlwaysBreakTemplateDeclarations" : "true",
+              \ "BreakBeforeBraces" : "Allman",
+              \ "Standard" : "C++11"}
+
+  	augroup ClangFormatSettings
+		autocmd!
+		" map to <Leader>cf in C++ code
+		autocmd FileType h,c,cpp,objc, noremap <buffer> <leader>cf :<C-u>ClangFormat<CR>
+		autocmd FileType h,c,cpp,objc, vnoremap <buffer> <leader>cf :ClangFormat<CR>
+		" if you install vim-operator-user
+		autocmd FileType h,c,cpp,objc, map <buffer><leader>x <Plug>(operator-clang-format)
+		" Toggle auto formatting:
+		autocmd FileType h,c,cpp,objc, map <leader>C :ClangFormatAutoToggle<CR>
+	augroup END
+
+" }}}
+
+" Spell checker {{{
+autocmd FileType md,txt setlocal spell spelllang=en_us
+
+"  }}}
