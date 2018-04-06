@@ -6,6 +6,8 @@ set shell=bash						" Vim expects posix-compliant shell
 set hidden                          " Hide buffer instead of destroying it when openning a new buffer
 set encoding=utf-8                  " Sets how vim shall represent characters internally. Utf-8 is necessary for most flavors of Unicode.
 set cryptmethod=blowfish2			" Use the best encryption method when writing crypted files
+set history=200						" remember 200 commands in history instead of 12 by default
+
 "}}}
 
 "Plugin Installing {{{
@@ -63,8 +65,32 @@ if g:has_plugin_vundle
 	" Clang formatter plugin
 	Plugin 'rhysd/vim-clang-format'
 
+	" Clang C++ complete plugin
+	Plugin 'Rip-Rip/clang_complete'
+
 	" Plugin for defining custom user's operators
 	Plugin 'kana/vim-operator-user'
+
+	" Pluging for Racket functional lang
+	Plugin 'wlangstroth/vim-racket'
+	
+	" Racket docs and completion
+	Plugin 'MicahElliott/vrod'
+
+	" Ack search tool from Vim 
+	Plugin 'mileszs/ack.vim'
+
+	" A filetype plugin for gprof output files (GNU profiler)
+	Plugin 'vim-scripts/gprof.vim'
+
+	" Toggle between one window and multi-window
+	Plugin 'itspriddle/ZoomWin'
+
+    " A library plugin for Vim to define your own text objects
+	Plugin 'kana/vim-textobj-user'
+
+    " Provide text objects (ae and ie) to select the entire buffer
+    Plugin 'kana/vim-textobj-entire'
 
 	call vundle#end()
 
@@ -89,6 +115,7 @@ endif
 
 "Colors {{{
 let g:solarized_termcolors=16
+let g:solarized_diffmode="high"			" Set high visibility for diff mode
 syntax on    							" Enable syntax highlighting. 
 set t_Co=16                             " Set vim to use 16
 
@@ -124,6 +151,9 @@ nnoremap k gk
 " Allow saving of files as sudo when I forgot to start vim using sudo.
 cmap w!! w !sudo tee > /dev/null %
 
+" In command line mode use <up>/<down> commands for history
+cnoremap <C-p> <Up>
+cnoremap <C-n> <Down>
 "}}}
 
 "UI Config {{{
@@ -352,13 +382,23 @@ endif
   	augroup ClangFormatSettings
 		autocmd!
 		" map to <Leader>cf in C++ code
-		autocmd FileType h,c,cpp,objc, noremap <buffer> <leader>cf :<C-u>ClangFormat<CR>
-		autocmd FileType h,c,cpp,objc, vnoremap <buffer> <leader>cf :ClangFormat<CR>
+		autocmd FileType h,c,hpp,cpp,objc, noremap <buffer> <leader>cf :<C-u>ClangFormat<CR>
+		autocmd FileType h,c,hpp,cpp,objc, vnoremap <buffer> <leader>cf :ClangFormat<CR>
 		" if you install vim-operator-user
-		autocmd FileType h,c,cpp,objc, map <buffer><leader>x <Plug>(operator-clang-format)
+		autocmd FileType h,c,hpp,cpp,objc, map <buffer><leader>x <Plug>(operator-clang-format)
+		" Enable auto formatting:
+		autocmd FileType h,c,hpp,cpp,objc, ClangFormatAutoEnable
 		" Toggle auto formatting:
-		autocmd FileType h,c,cpp,objc, map <leader>C :ClangFormatAutoToggle<CR>
+		autocmd FileType h,c,hpp,cpp,objc, map <leader>C :ClangFormatAutoToggle<CR>
+		
 	augroup END
+
+" }}}
+
+" Clang-complete settings {{{
+		" path to directory where library can be found
+		"let g:clang_library_path='/usr/lib/llvm-3.8/lib/'
+		let g:clang_library_path='/usr/lib/x86_64-linux-gnu/libclang-3.8.so.1'
 
 " }}}
 
