@@ -174,3 +174,9 @@ alias l='ls -CF'                              #
 
 # use solarized clors
 [[ -f ~/.dir_colors ]] && eval $(dircolors ~/.dir_colors)
+
+#tmuxinator sessions configuration
+[[ -f ~/.bin/tmuxinator.bash ]] && source ~/.bin/tmuxinator.bash
+
+#default shell editor (required by tmuxinator)
+export EDITOR='vim'
