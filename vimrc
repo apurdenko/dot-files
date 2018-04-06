@@ -117,6 +117,9 @@ nnoremap <C-k> <C-W>k
 nnoremap <C-h> <C-W>h
 nnoremap <C-l> <C-W>l
 
+" Maximize current window
+nnoremap <C-W>z :tab sp<CR>
+
 " Treat long lines as break lines (useful when moving around in them)
 nnoremap j gj
 nnoremap k gk
