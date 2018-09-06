@@ -56,9 +56,18 @@ if g:has_plugin_vundle
 	" commenting code
 	Plugin 'tpope/vim-commentary'
 
+	" all about "surroundings": parentheses, brackets, quotes, XML tags, and more. 
+	Plugin 'tpope/vim-surround'
+
+	" remaps . to repeat not only native commands
+	Plugin 'tpope/vim-repeat'
+
 	" source code browser
 	Plugin 'vim-scripts/taglist.vim'
 
+	" Full path fuzzy file, buffer, mru, tag, ... finder for Vim.
+	Plugin 'ctrlpvim/ctrlp.vim'
+	
 	" swtich between source files and header files
 	Plugin 'vim-scripts/a.vim'
 
@@ -66,7 +75,7 @@ if g:has_plugin_vundle
 	Plugin 'rhysd/vim-clang-format'
 
 	" Clang C++ complete plugin
-	Plugin 'Rip-Rip/clang_complete'
+	" Plugin 'Rip-Rip/clang_complete'
 
 	" Plugin for defining custom user's operators
 	Plugin 'kana/vim-operator-user'
@@ -148,8 +157,8 @@ nnoremap <C-l> <C-W>l
 nnoremap <C-W>z :tab sp<CR>
 
 " Treat long lines as break lines (useful when moving around in them)
-nnoremap j gj
-nnoremap k gk
+" nnoremap j gj
+" nnoremap k gk
 
 " Allow saving of files as sudo when I forgot to start vim using sudo.
 cmap w!! w !sudo tee > /dev/null %
@@ -234,6 +243,13 @@ if has("autocmd")
     autocmd FileType make set tabstop=4 shiftwidth=4 softtabstop=0 noexpandtab
     " Use chars in c/cpp.
 	autocmd FileType h,c,cpp,objc, set expandtab ts=4 sw=4 ai
+	
+	" FUSE automounts for archives
+	autocmd FileType *.zip,*.jar,*.war,*.ear FUSE_MOUNT|fuse-zip %SOURCE_FILE %DESTINATION_DIR
+
+	" FUSE automounts for ssh
+	autocmd FileType *.ssh FUSE_MOUNT2|sshfs %PARAM %DESTINATION_DIR
+
 endif
 
 "}}}
