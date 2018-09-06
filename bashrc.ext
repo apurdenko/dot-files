@@ -89,6 +89,17 @@ alias ll='ls -lA'                              # long list
 alias la='ls -A'                              # all but . and ..
 alias l='ls -CF'                              #
 
+alias cdshu='cd ~/csp/delphi/src/shared-utilities'                              #
+alias cdcu='cd ~/csp/delphi/src/common-utilities'                              #
+alias cdgc='cd ~/csp/delphi/src/global-compositor'                              #
+alias cdtsp='cd ~/csp/delphi/src/tile-spawn-proxy'                              #
+alias cdcfg='cd ~/csp/delphi/src/config'                              #
+alias cdhmi='cd ~/csp/delphi/src/tilehmi'                              #
+alias cdsdk='cd ~/csp/delphi/jenkins/release_builds'                              #
+
+alias gitcygwinpull='rm .git/FETCH_HEAD ; git co dev; git br -D gm; git co -b gm -t gerrit/master; git pull'
+
+
 # Umask
 #
 # /etc/profile sets 022, removing write perms to group + others.
