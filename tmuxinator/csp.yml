@@ -31,9 +31,16 @@ windows:
   - shu: cd ~/csp/delphi/src/shared-utilities
   - gc: cd ~/csp/delphi/src/global-compositor
   - tsp: cd ~/csp/delphi/src/tile-spawn-proxy
-  - hmi: cd ~/csp/delphi/src/TileHMI_DMIB3/
-  - xen: 
+  - config: cd ~/csp/delphi/src/config
+  - hmi: cd ~/csp/delphi/src/tilehmi/
+  - cu: cd ~/csp/delphi/src/common-utilities/
+  - xen1: 
       layout: main-horizontal
       panes:
-        - dom0
-        - domu
+            - dom0 : ssh root@dom0_1
+            - infotain: ssh root@infotainment_1
+  - xen2: 
+      layout: main-horizontal
+      panes:
+            - dom0 : ssh root@dom0_2
+            - infotain: ssh root@infotainment_2
