@@ -344,6 +344,7 @@ if g:has_plugin_nerdtree
 
 	let g:NERDTreeDirArrowExpandable = '▸'
 	let g:NERDTreeDirArrowCollapsible = '▾'
+	let g:NERDTreeShowHidden=1
 
 	" Close vim if the only window left open is a NERDTree
 	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
