@@ -90,15 +90,9 @@ alias la='ls -A'                              # all but . and ..
 alias l='ls -CF'                              #
 alias reboot='echo reboot: HA-HA-HA'                              #
 
-alias cdshu='cd ~/csp/delphi/src/shared-utilities'                              #
-alias cdcu='cd ~/csp/delphi/src/common-utilities'                              #
-alias cdgc='cd ~/csp/delphi/src/global-compositor'                              #
-alias cdtsp='cd ~/csp/delphi/src/tile-spawn-proxy'                              #
-alias cdcfg='cd ~/csp/delphi/src/config'                              #
-alias cdhmi='cd ~/csp/delphi/src/tilehmi'                              #
-alias cdsdk='cd ~/csp/delphi/jenkins/release_builds'                              #
+alias p='readlink -f'
 
-alias gitcygwinpull='rm .git/FETCH_HEAD ; git co dev; git br -D gm; git co -b gm -t gerrit/master; git pull'
+# alias gitcygwinpull='rm .git/FETCH_HEAD ; git co dev; git br -D gm; git co -b gm -t gerrit/master; git pull'
 
 
 # Umask
@@ -192,3 +186,6 @@ alias gitcygwinpull='rm .git/FETCH_HEAD ; git co dev; git br -D gm; git co -b gm
 
 #default shell editor (required by tmuxinator)
 export EDITOR='vim'
+
+PS1="\n\342\224\214$(echo $PS1 | sed 's|^\(.*\)\\\$$|\1|')\n\342\224\224> "
+
