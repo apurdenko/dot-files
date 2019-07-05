@@ -1,4 +1,4 @@
-"Misc settings {{{
+" Misc settings {{{
 " Use vim settings instead of the vi settings.
 " Put this first, because it changes other options as a side effect.
 set nocompatible                       
@@ -7,6 +7,17 @@ set hidden                          " Hide buffer instead of destroying it when 
 set encoding=utf-8                  " Sets how vim shall represent characters internally. Utf-8 is necessary for most flavors of Unicode.
 set cryptmethod=blowfish2			" Use the best encryption method when writing crypted files
 set history=200						" remember 200 commands in history instead of 12 by default
+
+" set mouse=a " allo mosue in all modes
+
+set spell spelllang=en_us
+
+set noswapfile " no swap files
+
+set autoread " autoread buffer of changed outside of vim files
+
+" let g:netrw_bunner = 0 "no header spam in directory mode
+" let g:netrw_liststype = 3 "tree style
 
 "}}}
 
@@ -27,6 +38,7 @@ let g:has_plugin_vundle = isdirectory(expand("~/.vim/bundle/Vundle.vim/.git"))
 let g:has_plugin_vim_colors_solarized = isdirectory(expand("~/.vim/bundle/vim-colors-solarized/.git"))
 let g:has_plugin_nerdtree = isdirectory(expand("~/.vim/bundle/nerdtree/.git")) 
 let g:has_plugin_vim_commentary = isdirectory(expand("~/.vim/bundle/vim-commentary/.git")) 
+let g:has_plugin_syntastic = isdirectory(expand("~/.vim/bundle/Vundle.vim/syntax/"))
 
 " set the runtime path to include Vundle and initialize
 set runtimepath+=~/.vim/bundle/Vundle.vim
@@ -41,9 +53,15 @@ if g:has_plugin_vundle
 	" Solarized colorscheme. On GitHub.
 	Plugin 'altercation/vim-colors-solarized'
 
+	" commenting code
+	Plugin 'tpope/vim-commentary'
+
 	" File manager. On GitHub. 
 	Plugin 'scrooloose/nerdtree'
-	
+
+    " A plugin that show the current file on NERDtree
+    " Plugin 'unkiwii/vim-nerdtree-sync'
+
 	" Open file and go to line: vim hello.cpp:10. On GitHub.
 	Plugin 'bogado/file-line'
 	
@@ -53,17 +71,23 @@ if g:has_plugin_vundle
 	" PlantUML syntax
 	Plugin 'aklt/plantuml-syntax'
 
-	" commenting code
-	Plugin 'tpope/vim-commentary'
-
 	" all about "surroundings": parentheses, brackets, quotes, XML tags, and more. 
 	Plugin 'tpope/vim-surround'
 
 	" remaps . to repeat not only native commands
 	Plugin 'tpope/vim-repeat'
 
+    " Git wrapper
+    Plugin 'tpope/vim-fugitive'
+
+    " A Vim plugin which shows a git diff in the gutter (sign column) and stages/undoes hunks 
+    Plugin 'airblade/vim-gitgutter'
+
 	" source code browser
 	Plugin 'vim-scripts/taglist.vim'
+    
+    " A syntax checking plugin for Vim which runs files through external syntax checkers
+    Plugin 'vim-syntastic/syntastic'
 
 	" Full path fuzzy file, buffer, mru, tag, ... finder for Vim.
 	Plugin 'ctrlpvim/ctrlp.vim'
@@ -75,7 +99,7 @@ if g:has_plugin_vundle
 	Plugin 'rhysd/vim-clang-format'
 
 	" Clang C++ complete plugin
-	" Plugin 'Rip-Rip/clang_complete'
+	Plugin 'Rip-Rip/clang_complete'
 
 	" Plugin for defining custom user's operators
 	Plugin 'kana/vim-operator-user'
@@ -101,6 +125,35 @@ if g:has_plugin_vundle
     " Provide text objects (ae and ie) to select the entire buffer
     Plugin 'kana/vim-textobj-entire'
 
+	" Restores iFocusGained and FocusLost autocommand events when using vim inside Tmux
+	Plugin 'tmux-plugins/vim-tmux-focus-events'
+
+	" vim plugin for tmux.conf: proper syntax highlighting, commening etc 
+	Plugin 'tmux-plugins/vim-tmux'
+
+	" seamless integration for vim and tmux's clipboard
+	Plugin 'roxma/vim-tmux-clipboard'
+
+	" Golang support
+	Plugin 'fatih/vim-go'
+    
+    " Vim terminal debugging for python (at least for now) 
+    Plugin 'epheien/termdbg'
+
+	" Lib that provides An Interface to WEB APIs for other plugins
+	Plugin 'mattn/webapi-vim'
+
+    " Provides Rust file detection, formatting etc., depends on webapi-vim
+    Plugin 'rust-lang/rust.vim'
+
+    " Provides powerline support for status line
+    Plugin 'powerline/powerline', {'rtp': 'powerline/bindings/vim/'}
+    " Plugin 'powerline/powerline'
+
+	" Status line for vim like powerline
+	" Plugin 'vim-airline/vim-airline'
+	" Plugin 'vim-airline/vim-airline-themes'
+	
 	call vundle#end()
 
 	" turn on to activate filetype-speciffic settings read from plugins
@@ -117,10 +170,13 @@ endfunction
 
 " Commentary settings {{{"
 if g:has_plugin_vim_commentary
-	autocmd FileType c,cpp,cs,java setlocal commentstring=//\ %s
+	autocmd FileType h,hpp,c,cpp,cs,java setlocal commentstring=//\ %s
 endif
 "}}}"
 
+" taglist plugin  settings {{{"
+let g:Tlist_Use_Right_Window   = 1
+"}}}"
 
 "Colors {{{
 let g:solarized_termcolors=16
@@ -134,6 +190,27 @@ if g:has_plugin_vim_colors_solarized
     call togglebg#map("<F5>")
 endif
 "}}}
+
+" Syntastic settings {{{"
+if g:has_plugin_syntastic
+    " set statusline+=%#warningmsg#
+    " set statusline+=%{SyntasticStatuslineFlag()}
+    " set statusline+=%*
+
+    let g:syntastic_always_populate_loc_list = 1
+    " let g:syntastic_auto_loc_list = 1
+    let g:syntastic_auto_loc_list = 0
+    " let g:syntastic_check_on_open = 1
+    let g:syntastic_check_on_open = 0
+    let g:syntastic_check_on_wq = 0
+
+
+    let g:syntastic_cpp_config_file = '.syntastic-cpp-gcc'
+	let g:syntastic_cpp_compiler = "g++"
+	let g:syntastic_cpp_compiler_options = "-std=c++11 -Wall -Wextra -Wpedantic"
+
+endif
+"}}}"
 
 " Key Shortcuts {{{
 " Set map leader to ',' and local mapleader to '\'
@@ -154,7 +231,7 @@ nnoremap <C-h> <C-W>h
 nnoremap <C-l> <C-W>l
 
 " Maximize current window
-nnoremap <C-W>z :tab sp<CR>
+" nnoremap <C-W>z :tab sp<CR>
 
 " Treat long lines as break lines (useful when moving around in them)
 " nnoremap j gj
@@ -171,7 +248,7 @@ cnoremap <C-n> <Down>
 "UI Config {{{
 set showcmd                             " Show command in the bottom bar
 set showmode                            " Show vim insert mode
-set cursorline                          " Highlite current line
+" set cursorline                          " Highlite current line
 set wildmenu                            " Visual autocomplete for command menu
 set wildmode=longest:list,full          " First tab will complete to longest string and show the match list, 
                                         " then second tab will complete to first full match and open the wildmenu.
@@ -211,7 +288,7 @@ set smartcase                           " Inteligent case handling in search: ig
 "set gdefault                            " Applies substitutions globally on lines.
 set incsearch                           " While typing a search command, show where the pattern, as it was typed so far, matches. 
 set showmatch                           " Highlight matching [{()}]
-set hlsearch                            " When there is a previous search pattern, highlight all its matches.
+" set hlsearch                            " When there is a previous search pattern, highlight all its matches.
 
 set path+=**                        " Allow recurcive file searching and completion
 
@@ -219,8 +296,8 @@ set path+=**                        " Allow recurcive file searching and complet
 nnoremap <leader><space> :noh<cr>
 
 " Make the tab key match bracket pairs.
-nnoremap <tab> %
-vnoremap <tab> %
+" nnoremap <tab> %
+" vnoremap <tab> %
 "}}}
 
 "Spaces & Tabs {{{
@@ -229,7 +306,7 @@ set softtabstop=4        		" A tab alos is 4 spaces when inserting it in insert 
 set expandtab              		" Expand tabs by default (overloadable per file type later)
 set shiftwidth=4          		" Number of spaces to use for autoindenting
 set shiftround            		" Use multiple of shiftwidth when indenting with '<' and '>'j
-set smarttab            " insert tabs on the start of a line according to shiftwidth, not tabstop
+set smarttab					" insert tabs on the start of a line according to shiftwidth, not tabstop
 set autoindent             		" always set autoindenting on
 set copyindent             		" copy the previous indentation on autoindenting
 set backspace=indent,eol,start 	" Allow backspacing over everything in insert mode.
@@ -255,7 +332,7 @@ endif
 "}}}
 
 "Editing {{{
-set pastetoggle=<F2>					" When in insert mode, press <F2> to switch to paste mode, 
+set pastetoggle=<F3>					" When in insert mode, press <F2> to switch to paste mode, 
 										" this allows to paste mass data that won't be autoindented
 set binary                              " Set binary mode to newer write final new line when aditig binary file
 
@@ -314,7 +391,7 @@ nnoremap z5 :set foldlevel=5<cr>
 "}}}
 
 " Text wrapping {{{
-set wrap					" Wrap lines longer than the width of the window
+" set wrap					" Wrap lines longer than the width of the window
 set colorcolumn=80
 
 set textwidth=0		" set textwrap to 0 to disable text wrapping
@@ -340,14 +417,13 @@ endfunction
 if g:has_plugin_nerdtree
 	" Open/close file tree
 	nnoremap <leader>nt :NERDTreeToggle<CR>
-	nnoremap <leader>nf :NERDTreeFind<CR>
+	nnoremap <leader>nf :NERDTreeFind <CR> zz :wincmd p <CR> 
 
 	let g:NERDTreeDirArrowExpandable = '▸'
 	let g:NERDTreeDirArrowCollapsible = '▾'
 	let g:NERDTreeShowHidden=1
-
-	" Close vim if the only window left open is a NERDTree
-	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+	let g:NERDTreeHighlightCursorline = 1
+    let g:NERDTreeMouseMode=3
 
 	" Open NERDTree automatically when vim starts up on opening a directory
 	autocmd StdinReadPre * let s:std_in=1
@@ -389,29 +465,12 @@ endif
 
 " Clang-format Settings {{{
 
-	let g:clang_format#code_style = "llvm"
-	let g:clang_format#style_options = {
-              \ "IndentWidth" : 4,
-              \ "UseTab" : "Never",
-              \ "AccessModifierOffset" : -4,
-              \ "AllowShortIfStatementsOnASingleLine" : "true",
-              \ "AlwaysBreakTemplateDeclarations" : "true",
-              \ "BreakBeforeBraces" : "Allman",
-              \ "Standard" : "C++11"}
-
-  	augroup ClangFormatSettings
-		autocmd!
-		" map to <Leader>cf in C++ code
-		autocmd FileType h,c,hpp,cpp,objc, noremap <buffer> <leader>cf :<C-u>ClangFormat<CR>
-		autocmd FileType h,c,hpp,cpp,objc, vnoremap <buffer> <leader>cf :ClangFormat<CR>
-		" if you install vim-operator-user
-		autocmd FileType h,c,hpp,cpp,objc, map <buffer><leader>x <Plug>(operator-clang-format)
-		" Enable auto formatting:
-		autocmd FileType h,c,hpp,cpp,objc, ClangFormatAutoEnable
-		" Toggle auto formatting:
-		autocmd FileType h,c,hpp,cpp,objc, map <leader>C :ClangFormatAutoToggle<CR>
-		
-	augroup END
+    " automatically detects the style file (.clang-format or _clang-format) 
+    let g:clang_format#detect_style_file = 1
+	" 0 - do not apply formatting if ithe style file is not found
+	let g:clang_format#enable_fallback_style = 0
+    " format on save
+    let g:clang_format#auto_format = 1 
 
 " }}}
 
