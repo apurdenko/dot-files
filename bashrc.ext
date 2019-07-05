@@ -196,24 +196,25 @@ alias p='readlink -f'
 export EDITOR='vim'
 
 # PS1="\n\342\224\214$(echo $PS1 | sed 's|^\(.*\)\\\$$|\1|')\n\342\224\224> "
-function start_tmux_session()
-{
-	local name=$1
-	local prev=
-	if ! tmux ls | grep -q $name ; then
-		if tmuxinator list 2>/dev/null | grep -q $name ; then 
-			tmuxinator start $name
-		else
-			if [ ! x"$(echo $TMUX)" = x"" ] ; then
-				tmux detach
-			fi
-			tmux new -s $name
-		fi
-	fi
-}
 
-# always have tmux session up and run
-start_tmux_session base
-tmux attach
+# function start_tmux_session()
+# {
+# 	local name=$1
+# 	local prev=
+# 	if ! tmux ls | grep -q $name ; then
+# 		if tmuxinator list 2>/dev/null | grep -q $name ; then 
+# 			tmuxinator start $name
+# 		else
+# 			if [ ! x"$(echo $TMUX)" = x"" ] ; then
+# 				tmux detach
+# 			fi
+# 			tmux new -s $name
+# 		fi
+# 	fi
+# }
+
+# # always have tmux session up and run
+# start_tmux_session base
+# tmux attach
 
 
