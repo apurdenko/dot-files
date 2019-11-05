@@ -195,6 +195,31 @@ alias p='readlink -f'
 #default shell editor (required by tmuxinator)
 export EDITOR='vim'
 
+function tmux_fix_resurrect ()
+{
+	# kill all sessions 
+	for t in $(tmux ls | cut -d ':' -f1) ; do
+		tmux kill-session -t $t
+	done
+
+	# remove empty states
+	pushd $HOME/.tmux/resurrect
+		for s in $(find . -name "tmux_resurrect_*.txt") ; do
+			if [ 0 == $(du $s | cut -f1) ] ; then 
+				rm -v $s
+			fi
+		done
+
+		# set the last symlink
+		if [ -e last ] ; then 
+			rm -v last
+		fi
+		ln -sfv $(ls -t1 tmux_resurrect_*.txt | head -n 1) last
+
+	popd
+}
+
+
 # PS1="\n\342\224\214$(echo $PS1 | sed 's|^\(.*\)\\\$$|\1|')\n\342\224\224> "
 
 # function start_tmux_session()
@@ -216,5 +241,7 @@ export EDITOR='vim'
 # # always have tmux session up and run
 # start_tmux_session base
 # tmux attach
+
+alias viber_mini="env QT_AUTO_SCREEN_SCALE_FACTOR=0 /opt/viber/Viber"
 
 
